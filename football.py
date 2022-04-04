@@ -30,6 +30,25 @@ distance = 0
 direction = 0
 posiball = 0
 heading = 0
+
+#camera component
+cameraMidPointX = 150 #will be modified
+cameraMidPointY = 150 #will be modified
+
+farRangeX = 50
+farRangeY = 50
+
+farRangeSpeed = 90
+nearRangeSpeed = 40
+
+xPoint = 0
+yPoint = 0
+
+xMove = 0;
+yMove = 0;
+
+outRange = False
+
 #-------------------------------------------------------
 #funtion
 def angle_get():
@@ -65,14 +84,47 @@ def stopMotor():
     rcu.SetMotor(2,0)
 #--------------------------------------------
 stopMotor()
-rcu.SetAHRS(7,1)    
+rcu.SetAHRS(7,1) 
+
 while True:
     #Cam_get()
     #print('direction', direction)
-    angle= rcu.GetAHRS(7,3,0)+0
+    angle= rcu.GetAHRS(7,3,0)-0
     rcu.SetDisplayVar(1,rcu.GetAHRS(7,3,0),0xFFE0,0x0000)
     rcu.SetDisplayVar(2,angle,0xFFE0,0x0000)
-    move(0, -150, angle)
+    xPoint = rcu.GetAICamData(1)
+    yPoint = rcu.GetAICamData(2)
+
+    if (xPoint < cameraMidPointX - 30):
+        yMove = 1
+    elif (xPoint > cameraMidPointX + 30):
+        yMove = -1
+    else:
+        yMove = 0
+    
+    xMove = 1
+    outRange = False
+    if (xPoint == 0) or (yPoint == 0):
+        outRange = True
+        xMove = -1
+        yMove = 0
+
+    if (outRange):
+        xMove *= 80
+    else:
+        if (yPoint > cameraMidPointY):
+            xMove *= farRangeSpeed
+        else:
+            xMove *= nearRangeSpeed
+
+        if (xPoint > cameraMidPointX + farRangeX):
+            yMove *= farRangeSpeed
+        elif (xPoint <= cameraMidPointX - farRangeX):
+            yMove *= nearRangeSpeed
+    
+
+
+    move(xMove, yMove, angle)
 
 
 
