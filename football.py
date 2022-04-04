@@ -75,3 +75,21 @@ while True:
     move(0, -150, angle)
 
 
+
+# import rcu
+
+# def task1():
+#   rcu.SetMotorCode(1)
+#   rcu.SetAHRS(1,1)
+#   while True:
+#     rcu.SetDisplayString(1,"đọc encoder",0xFFE0,0x0000)
+#     rcu.SetDisplayVar(1,rcu.GetMotorCode(1),0xFFE0,0x0000)
+#     rcu.SetMotorPower(100,100,100,100)
+#     rcu.SetDisplayString(1,"đọc gyro",0xFFE0,0x0000)
+#     rcu.SetDisplayVar(1,rcu.GetAHRS(1,3,0),0xFFE0,0x0000)
+#     rcu.SetDisplayString(1,"đọc tọa độ banh",0xFFE0,0x0000)
+#     rcu.SetDisplayVar(1,"".join((rcu.GetAICamData(1),rcu.GetAICamData(2))),0xFFE0,0x0000)
+#     rcu.SetDisplayString(1,"đọc color",0xFFE0,0x0000)
+#     rcu.SetDisplayVar(1,rcu.GetColorSensor(1,4),0xFFE0,0x0000)
+
+# task1()
