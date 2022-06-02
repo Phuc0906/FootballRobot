@@ -105,12 +105,19 @@ while True:
         isSetCurve = False
     
     if (setCurve):
-        if (rcu.GetUltrasound(6) < minUltraRange):
-            heading = 30
-        elif (rcu.GetUltrasound(6) > maxUltraRange):
-            heading = -30
+        if (currentTime - lastTime < 2500):
+            if (rcu.GetUltrasound(6) < minUltraRange):
+                heading = 30
+            elif (rcu.GetUltrasound(6) > maxUltraRange):
+                heading = -30
+        else:
+            isSetCurve = False
+            lastTime = currentTime
     else:
         isSetCurve = False
+
+    currentTime = rcu.GetSysTime()
+    
     angle= rcu.GetAHRS(7,3,0)- heading
     rcu.SetDisplayVar(1,heading,0xFFE0,0x0000)
     rcu.SetDisplayVar(2,angle,0xFFE0,0x0000)
