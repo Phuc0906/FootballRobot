@@ -88,7 +88,31 @@ rcu.SetSysTime()
 blData = 0
 lastTime = rcu.GetSysTime()
 currentTime = rcu.GetSysTime()
+setCurve = False
+isSetCurve = False
 while True:
+    heading = 0
+    if ((rcu.GetLightSensor(4) > 200) or (rcu.GetLightSensor(1) > 200)):
+        if (currentTime - lastTime > 2500) and (isSetCurve != True):
+            setCurve = True
+            lastTime = currentTime
+            isSetCurve = True
+        else:
+            setCurve = False
+            isSetCurve = False
+    else:
+        setCurve = False
+        lastTime = currentTime
+        isSetCurve = False
+    
+    if (setCurve):
+        if (rcu.GetUltrasound(6) < minUltraRange):
+            heading = 30
+        elif (rcu.GetUltrasound(6) > maxUltraRange):
+            heading = -30
+    else:
+        isSetCurve = False
+    
     angle= rcu.GetAHRS(7,3,0)- heading
     rcu.SetDisplayVar(1,heading,0xFFE0,0x0000)
     rcu.SetDisplayVar(2,angle,0xFFE0,0x0000)
@@ -107,8 +131,22 @@ while True:
         outRange = True
         xMove = 1
         yMove = 0
-    if (outRange) and ((rcu.GetLightSensor(4) > 200) or (rcu.GetLightSensor(1) > 200) ):
+    if (outRange) and ((rcu.GetLightSensor(4) > 200) or (rcu.GetLightSensor(1) > 200)):
         xMove *= -120
+    elif  (outRange) and ((rcu.GetLightSensor(4) < 200) or (rcu.GetLightSensor(1) < 200)):
+        if (rcu.GetUltrasound(6) < minUltraRange):
+            yMove = 120
+        elif (rcu.GetUltrasound(6) > maxUltraRange):
+            yMove = -120
+        else:
+            yMove = 0
+
+        if (rcu.GetUltrasound(5) <= 10):
+            xMove = -120
+        elif (rcu.GetUltrasound(5) <= 30):
+            xMove = 0
+        else:
+            xMove = 120
     else:
         if (yPoint > cameraMidPointY):
             xMove *= farRangeSpeed
@@ -122,17 +160,7 @@ while True:
         elif (xPoint <= cameraMidPointX - farRangeX):
             yMove *= nearRangeSpeed
 
-    if (currentTime - lastTime >= 0):
-        blData = rcu.GetBluetoothData()
-        if (rcu.GetLightSensor(4) > 100):
-            rcu.SetDisplayString(3,"Attacing",0xFFE0,0x0000)
-            rcu.SetBluetoothData(0)
-        else:
-            rcu.SetDisplayString(3,"Finding Ball",0xFFE0,0x0000)
-            rcu.SetBluetoothData(1)
-            lastTime = currentTime
-
-    
+    blData = rcu.GetBluetoothData()
     if (blData == 0):
         if (rcu.GetUltrasound(6) < minUltraRange):
             yMove = 120
@@ -141,10 +169,19 @@ while True:
         else:
             yMove = 0
 
-        if (rcu.GetUltrasound(5) <= 30):
+        if (rcu.GetUltrasound(5) <= 10):
+            xMove = -120
+        elif (rcu.GetUltrasound(5) <= 30):
             xMove = 0
         else:
             xMove = 120
+    else:
+        if (rcu.GetLightSensor(4) > 100):
+            rcu.SetDisplayString(3,"Attacing",0xFFE0,0x0000)
+            rcu.SetBluetoothData(0)
+        else:
+            rcu.SetDisplayString(3,"Finding Ball",0xFFE0,0x0000)
+            rcu.SetBluetoothData(1)
 
     currentTime = rcu.GetSysTime()
     rcu.SetDisplayString(5,"Light 4",0xFFE0,0x0000)
